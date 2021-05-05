@@ -3,3 +3,15 @@ npm i node-sass
 
 -- se instala react router
 npm i react-router-dom
+
+-- instalacion redux
+npm i react-redux react
+
+-- instalacion firebase
+npm i firebase
+
+-- para llamadas asincronas con redux
+npm i --save redux-thunk
+
+-- para validaciones en campos de formularios
+npm i validator

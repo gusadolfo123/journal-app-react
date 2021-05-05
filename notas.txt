@@ -15,3 +15,6 @@ npm i --save redux-thunk
 
 -- para validaciones en campos de formularios
 npm i validator
+
+-- para mensajes emergentes
+npm i sweetalert2

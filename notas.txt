@@ -18,3 +18,9 @@ npm i validator
 
 -- para mensajes emergentes
 npm i sweetalert2
+
+-- manejo de fechas
+npm i momentjs
+
+
+

@@ -1,7 +1,34 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useRef } from "react";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
+import { activeNote } from "../../actions/notes";
+import { useForm } from "../../hooks/useForm";
 import { NotesAppBar } from "./NotesAppBar";
 
 export const NotePage = () => {
+  const distpatch = useDispatch();
+  const { active: note } = useSelector((state) => state.notes);
+
+  const { url } = note;
+
+  const [values, handleInputChange, reset] = useForm(note);
+
+  const activeId = useRef(note.id);
+
+  useEffect(() => {
+    if (note.id !== activeId.current) {
+      reset(note);
+      activeId.current = note.id;
+    }
+  }, [note, reset]);
+
+  useEffect(() => {
+    distpatch(activeNote(values.id, { ...values }));
+  }, [values, distpatch]);
+
+  const { title, body } = values;
+
   return (
     <div className="notes__main-content">
       <NotesAppBar />
@@ -12,19 +39,24 @@ export const NotePage = () => {
           placeholder="Someawesome title"
           className="notes__title-input"
           autoComplete="off"
+          name="title"
+          value={title}
+          onChange={handleInputChange}
         />
 
         <textarea
           placeholder="what happened today"
           className="notes__textarea"
+          name="body"
+          value={body}
+          onChange={handleInputChange}
         ></textarea>
 
-        <div className="notes__image">
-          <img
-            src="https://bnetcmsus-a.akamaihd.net/cms/blog_header/91/91RKJ6KC62PA1594365571485.jpg"
-            alt="imagen"
-          />
-        </div>
+        {url && (
+          <div className="notes__image">
+            <img src={url} alt="imagen" />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -12,7 +12,7 @@ export const startNewNode = () => {
       title: "",
       body: "",
       date: new Date().getTime(),
-      url: null,
+      url: "",
     };
 
     const docRef = await db.collection(`${uid}/journal/notes`).add(newNote);
@@ -24,13 +24,13 @@ export const updateNote = () => {
   return async (dispatch, getState) => {
     const { active: note } = getState().notes;
     const uid = getState().auth.uid;
-    // console.log(JSON.stringify(note));
-    const docRef = await db.doc(`${uid}/journal/notes/${note.id}/`);
-    await docRef.update({ ...note });
+    console.log(JSON.stringify(note));
+     const docRef = await db.doc(`${uid}/journal/notes/${note.id}/`);
+     await docRef.update({ ...note });
 
-    dispatch(refreshNote(note.id, note));
+     dispatch(refreshNote(note.id, note));
 
-    Swal.fire("Save", note.title, "success");
+     Swal.fire("Save", note.title, "success");
   };
 };
 
@@ -66,7 +66,8 @@ export const startUploading = (file) => {
   return async (dispatch, getState) => {
     const { active: note } = getState().notes;
     const url = await fileUpload(file);
-    // dispatch(refreshNote(activeNote.id, { ...note, url }));
-    console.log(url);
+    
+    dispatch(activeNote(note.id, { ...note, url  }))
+    dispatch(refreshNote(note.id, { ...note, url  }));
   };
 };

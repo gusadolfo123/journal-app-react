@@ -1,12 +1,17 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { startUploading, updateNote } from "../../actions/notes";
+import { useDispatch } from "react-redux";
+import {
+  refreshImageNote,
+  // refreshNote,
+  // startUploading,
+  saveNote,
+} from "../../actions/notes";
 
 export const NotesAppBar = () => {
   const dispatch = useDispatch();
 
   const handleButtonSave = () => {
-    dispatch(updateNote());
+    dispatch(saveNote());
   };
 
   const handlePictureUpload = () => {
@@ -16,7 +21,14 @@ export const NotesAppBar = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      dispatch(startUploading(file));
+      // dispatch(startUploading(file));
+      var reader = new FileReader();
+
+      reader.onload = function (e) {
+        dispatch(refreshImageNote(e.target.result));
+      };
+
+      reader.readAsDataURL(file);
     }
   };
 

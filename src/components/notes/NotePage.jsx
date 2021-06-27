@@ -9,25 +9,26 @@ import { NotesAppBar } from "./NotesAppBar";
 export const NotePage = () => {
   const distpatch = useDispatch();
   const { active: note } = useSelector((state) => state.notes);
-
-  const { url } = note;
-
   const [values, handleInputChange, reset] = useForm(note);
+  const { title, body } = values;
 
   const activeId = useRef(note.id);
+  const activeUrl = useRef(note.url);
 
   useEffect(() => {
     if (note.id !== activeId.current) {
       reset(note);
       activeId.current = note.id;
     }
+    if (note.url !== activeUrl.current) {
+      reset(note);
+      activeUrl.current = note.url;
+    }
   }, [note, reset]);
 
   useEffect(() => {
     distpatch(activeNote(values.id, { ...values }));
   }, [values, distpatch]);
-
-  const { title, body } = values;
 
   return (
     <div className="notes__main-content">
@@ -52,9 +53,9 @@ export const NotePage = () => {
           onChange={handleInputChange}
         ></textarea>
 
-        {url && (
+        {note.url && (
           <div className="notes__image">
-            <img src={url} alt="imagen" />
+            <img src={note.url} alt="imagen" />
           </div>
         )}
       </div>

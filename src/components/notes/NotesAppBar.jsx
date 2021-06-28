@@ -12,6 +12,7 @@ export const NotesAppBar = () => {
 
   const handleButtonSave = () => {
     dispatch(saveNote());
+    document.querySelector("#fileSelector").value = "";
   };
 
   const handlePictureUpload = () => {

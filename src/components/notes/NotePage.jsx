@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useRef } from "react";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
-import { activeNote } from "../../actions/notes";
+import { activeNote, startDeleting } from "../../actions/notes";
 import { useForm } from "../../hooks/useForm";
 import { NotesAppBar } from "./NotesAppBar";
 
@@ -27,8 +27,12 @@ export const NotePage = () => {
   }, [note, reset]);
 
   useEffect(() => {
-    distpatch(activeNote(values.id, { ...values }));
+    distpatch(activeNote({ ...values }));
   }, [values, distpatch]);
+
+  const handleDelete = () => {
+    distpatch(startDeleting(activeId.current));
+  };
 
   return (
     <div className="notes__main-content">
@@ -59,6 +63,10 @@ export const NotePage = () => {
           </div>
         )}
       </div>
+
+      <button className="btn btn-danger" onClick={handleDelete}>
+        Delete
+      </button>
     </div>
   );
 };

@@ -22,13 +22,13 @@ export const startNewNode = () => {
     // dispatch(setNewNote({ id: docRef.id, ...newNote }));
 
     // dispatch(setNewNote(newNote.id, { ...newNote }));
-    dispatch(activeNote(newNote.id, { ...newNote }));
+    dispatch(activeNote({ ...newNote }));
   };
 };
 
 export const saveNote = () => {
   return async (dispatch, getState) => {
-    const { active: note } = getState().notes;
+    const { active: note, notes } = getState().notes;
     let { url } = note;
     const uid = getState().auth.uid;
 
@@ -41,27 +41,45 @@ export const saveNote = () => {
       },
     });
 
-    if (url && url !== "") {
-      url = await fileUpload(url);
+    if (notes.find((el) => el.id === note.id)) {
+      if (
+        url &&
+        url !== "" &&
+        notes.find((el) => el.id === note.id && el.url !== url)
+      ) {
+        url = await fileUpload(url);
+      }
+
+      const id = note.id;
+      const docRef = await db.doc(`${uid}/journal/notes/${id}/`);
+      delete note.id;
+      await docRef.update({ ...note, url });
+
+      dispatch(refreshNote({ id, ...note, url }));
+
+      Swal.fire("Save", note.title, "success");
+    } else {
+      if (url && url !== "") {
+        url = await fileUpload(url);
+      }
+
+      delete note.id;
+      const docRef = await db
+        .collection(`${uid}/journal/notes`)
+        .add({ ...note, url });
+
+      dispatch(setNewNote({ id: docRef.id, ...note, url }));
+      // dispatch(refreshNote(note.id, note));
+
+      Swal.fire("Save", note.title, "success");
+      // Swal.close();
     }
-
-    await db.collection(`${uid}/journal/notes`).add({ ...note, url });
-
-    // const docRef = await db.doc(`${uid}/journal/notes/${docRef.id}/`);
-    // await docRef.update({ ...note });
-
-    dispatch(setNewNote(note.id, { ...note }));
-    // dispatch(refreshNote(note.id, note));
-
-    Swal.fire("Save", note.title, "success");
-    // Swal.close();
   };
 };
 
-export const activeNote = (id, note) => ({
+export const activeNote = (note) => ({
   type: types.notesActive,
   payload: {
-    id,
     ...note,
   },
 });
@@ -78,13 +96,14 @@ export const startLoadingNotes = (uid) => {
   };
 };
 
-export const refreshNote = (id, note) => ({
-  type: types.noteRefresh,
-  payload: {
-    id,
-    note,
-  },
-});
+export const refreshNote = (note) => {
+  return {
+    type: types.noteRefresh,
+    payload: {
+      ...note,
+    },
+  };
+};
 
 // export const startUploading = (file) => {
 //   return async (dispatch, getState) => {
@@ -100,14 +119,27 @@ export const refreshNote = (id, note) => ({
 export const refreshImageNote = (url) => {
   return async (dispatch, getState) => {
     const { active: note } = getState().notes;
-    dispatch(activeNote(note.id, { ...note, url }));
+    dispatch(activeNote({ ...note, url }));
   };
 };
 
-export const setNewNote = (id, note) => ({
+export const setNewNote = (note) => ({
   type: types.addNoteToList,
   payload: {
-    id,
     ...note,
   },
+});
+
+export const startDeleting = (id) => {
+  return async (dispatch, getState) => {
+    const uid = getState().auth.uid;
+
+    await db.doc(`${uid}/journal/notes/${id}/`).delete();
+    dispatch(deleteNote(id));
+  };
+};
+
+export const deleteNote = (id) => ({
+  type: types.notesDelete,
+  payload: id,
 });
